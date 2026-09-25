@@ -1,0 +1,177 @@
+{% extends "base.html" %}
+{% block title %}Family Care — Remote Elderly Monitoring{% endblock %}
+
+{% block content %}
+<div class="home-page">
+
+  <nav class="navbar">
+    <div class="navbar-logo">Family Care</div>
+    <div class="nav-links">
+      {% if session.user_id %}
+        <a href="{{ url_for('picker') }}" class="navbar-button button-link">Go to Dashboard</a>
+      {% else %}
+        <a href="{{ url_for('login') }}" class="navbar-button button-link">Log In</a>
+      {% endif %}
+    </div>
+  </nav>
+
+  <section class="hero">
+    <h1 class="hero-title">Peace of mind, every single day</h1>
+    <p class="hero-tagline">
+      We quietly watch daily activity patterns and tell you the moment
+      something looks different — so you don't have to check in
+      constantly to feel sure they're okay.
+    </p>
+    {% if session.user_id %}
+      <a href="{{ url_for('picker') }}" class="hero-button button-link">Open Dashboard</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="hero-button button-link">Get Started</a>
+    {% endif %}
+    <p class="hero-note">No hardware needed · Works with manual entry or devices</p>
+  </section>
+
+  <div class="trust-strip">
+    <span>7-day baseline learning</span>
+    <span class="trust-dot">·</span>
+    <span>Adaptive thresholds</span>
+    <span class="trust-dot">·</span>
+    <span>Multi-family accounts</span>
+    <span class="trust-dot">·</span>
+    <span>Device-ready API</span>
+  </div>
+
+  <section class="features">
+    <div class="feature-card">
+      <div class="feature-icon">📊</div>
+      <div class="feature-title">Learns their normal</div>
+      <div class="feature-text">
+        The system studies daily patterns to understand what's typical,
+        not just fixed rules.
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">⚠️</div>
+      <div class="feature-title">Instant alerts</div>
+      <div class="feature-text">
+        The moment something looks unusual, you'll see it clearly flagged.
+      </div>
+    </div>
+    <div class="feature-card">
+      <div class="feature-icon">💚</div>
+      <div class="feature-title">Built with care</div>
+      <div class="feature-text">
+        Designed to feel calm and reassuring, not clinical or alarming.
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-header-home">
+      <h2 class="section-title-home">How it works</h2>
+      <p class="section-subtitle-home">Four steps from setup to peace of mind</p>
+    </div>
+    <div class="steps-grid">
+      <div class="step-card">
+        <div class="step-number">1</div>
+        <h3 class="step-title">Create your account</h3>
+        <p class="step-text">Sign up in seconds, then add the family member you'll be watching over.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">2</div>
+        <h3 class="step-title">Baseline builds over 7 days</h3>
+        <p class="step-text">The system learns what's normal for that specific person — not a generic standard applied to everyone.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">3</div>
+        <h3 class="step-title">Activity data flows in</h3>
+        <p class="step-text">Log it manually, or connect a device through the API-key authenticated sensor feed.</p>
+      </div>
+      <div class="step-card">
+        <div class="step-number">4</div>
+        <h3 class="step-title">Alerts surface only when they matter</h3>
+        <p class="step-text">Adaptive thresholds avoid false alarms, and you see exactly why each day was flagged.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block alternate">
+    <div class="section-header-home">
+      <h2 class="section-title-home">Why this is different</h2>
+      <p class="section-subtitle-home">Design choices that avoid common pitfalls in monitoring apps</p>
+    </div>
+    <div class="different-grid">
+      <div class="different-card">
+        <div class="different-icon">🎯</div>
+        <h3 class="different-title">Adaptive, not fixed</h3>
+        <p class="different-text">Learns each person's own normal instead of using one-size-fits-all thresholds that trigger alert fatigue.</p>
+      </div>
+      <div class="different-card">
+        <div class="different-icon">🔍</div>
+        <h3 class="different-title">Transparent reasoning</h3>
+        <p class="different-text">Shows exactly why a day was flagged — the deviation from their personal baseline — not just a mystery red dot.</p>
+      </div>
+      <div class="different-card">
+        <div class="different-icon">⏳</div>
+        <h3 class="different-title">Honest about limits</h3>
+        <p class="different-text">Explicitly shows "still building baseline" for the first week instead of pretending to judge with no history.</p>
+      </div>
+      <div class="different-card">
+        <div class="different-icon">👨‍👩‍👧</div>
+        <h3 class="different-title">Made for families</h3>
+        <p class="different-text">Multiple family members can log in and check on the same person — responsibility doesn't land on one tired caregiver.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section-block">
+    <div class="section-header-home">
+      <h2 class="section-title-home">Frequently asked</h2>
+      <p class="section-subtitle-home">Honest answers to reasonable questions</p>
+    </div>
+    <div class="faq-list">
+      <details class="faq-item">
+        <summary class="faq-question"><span>Do I need a wearable or special hardware?</span><span class="faq-toggle">+</span></summary>
+        <div class="faq-answer">No. You can log activity manually, and the system also exposes a device-authenticated API endpoint — the same kind of interface a real wearable or home sensor would use.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-question"><span>How does it know what "normal" looks like?</span><span class="faq-toggle">+</span></summary>
+        <div class="faq-answer">The system learns each person's own baseline from their recent activity history, then flags days that deviate meaningfully from that baseline.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-question"><span>What happens during the first week?</span><span class="faq-toggle">+</span></summary>
+        <div class="faq-answer">The dashboard honestly shows "building baseline" for the first 7 days, since there isn't yet enough history to judge what is normal for that person.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-question"><span>Can more than one family member use it?</span><span class="faq-toggle">+</span></summary>
+        <div class="faq-answer">Yes. Multiple family accounts can be linked to the same elderly person, and a single family account can monitor multiple relatives.</div>
+      </details>
+      <details class="faq-item">
+        <summary class="faq-question"><span>Is my data secure?</span><span class="faq-toggle">+</span></summary>
+        <div class="faq-answer">This is a college project, so authentication is intentionally simplified — enough to demonstrate the flow, not enough for production.</div>
+      </details>
+    </div>
+  </section>
+
+  <section class="cta-banner">
+    <h2 class="cta-title">Ready to bring peace of mind?</h2>
+    <p class="cta-text">
+      Set up takes a minute. The baseline builds in a week.
+      The difference shows up the first time something changes.
+    </p>
+    {% if session.user_id %}
+      <a href="{{ url_for('picker') }}" class="cta-button button-link">Open Dashboard</a>
+    {% else %}
+      <a href="{{ url_for('login') }}" class="cta-button button-link">Get Started</a>
+    {% endif %}
+  </section>
+
+  <footer class="site-footer">
+    <div class="footer-brand">
+      <div class="footer-logo">Family Care</div>
+      <p class="footer-tagline">Remote elderly activity monitoring — built as a full-stack college project, 2026.</p>
+    </div>
+    <div class="footer-meta"><span>Flask · SQLite · Jinja2</span></div>
+  </footer>
+
+</div>
+{% endblock %}

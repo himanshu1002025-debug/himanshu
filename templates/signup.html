@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+{% block title %}Sign Up — Family Care{% endblock %}
+
+{% block content %}
+<div class="split-screen">
+  <div class="split-visual">
+    <div class="split-visual-logo">Family Care</div>
+    <div>
+      <p class="split-visual-quote">
+        "Set up takes a minute.<br>Peace of mind lasts longer."
+        <span>Create your account, then add the family members you'll be watching over.</span>
+      </p>
+    </div>
+    <div class="split-visual-footer">Remote elderly activity monitoring</div>
+  </div>
+
+  <div class="split-form-side">
+    <form class="login-card" method="POST" action="{{ url_for('signup') }}">
+      <h1 class="login-title">Create your account</h1>
+      <p class="login-subtitle">Set up your Family Care login</p>
+
+      <input class="login-input" type="text" name="username" placeholder="Choose a username" minlength="3" required autofocus>
+      <input class="login-input" type="password" name="password" placeholder="Choose a password" minlength="3" required>
+
+      <button class="login-button" type="submit">Sign Up</button>
+
+      <a href="{{ url_for('login') }}" class="back-link button-link">← Back to login</a>
+    </form>
+  </div>
+</div>
+{% endblock %}

@@ -1,0 +1,16 @@
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# Database (local data — not source code)
+elderly.db
+
+# Environment
+.env
+
+# OS / editor
+.DS_Store
+.vscode/
+.idea/
