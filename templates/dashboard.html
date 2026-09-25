@@ -8,12 +8,13 @@
 {% block content %}
 
 <nav class="dashboard-nav">
+  <button class="menu-button" data-toggle="sidebar" aria-label="Open daily log">☰</button>
   <div class="navbar-logo">Family Care</div>
   <div style="display: flex; gap: 10px;">
-  <a href="{{ url_for('doctors', elderly_id=elderly_id) }}" class="logout-button button-link">🩺 Doctors</a>
-  <a href="{{ url_for('picker') }}" class="logout-button button-link">← Family</a>
-  <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
-</div>
+    <a href="{{ url_for('doctors', elderly_id=elderly_id) }}" class="logout-button button-link">🩺 Doctors</a>
+    <a href="{{ url_for('picker') }}" class="logout-button button-link">← Family</a>
+    <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+  </div>
 </nav>
 
 <div class="page">
@@ -53,23 +54,39 @@
 
   <div class="dashboard-layout">
     <aside class="sidebar">
+      <button class="menu-button" data-toggle="sidebar">✕ Close</button>
       <h3 class="section-header">Daily log</h3>
       <div class="day-grid">
         {% for entry in alerts %}
-          <div class="day-card status-{{ entry.status.replace(' ', '-') if entry.status == 'building baseline' else entry.status }}">
+          {% set status_class = 'baseline' if entry.status == 'building baseline' else entry.status %}
+          <div class="day-card status-{{ status_class }}">
             <div class="day-label">{{ entry.date or ('Day ' ~ entry.day) }}</div>
             <div class="day-detail">Activity: {{ entry.movementCount }}</div>
             <div class="day-detail">Sleep: {{ entry.sleepHours }}h · woke {{ entry.timesWokenAtNight }}x</div>
+            {% if entry.reasons and entry.reasons|length > 0 %}
+              <div class="day-reasons">
+                Flagged: 
+                {%- for r in entry.reasons -%}
+                  {%- if r == 'movementCount' -%}Activity
+                  {%- elif r == 'sleepHours' -%}Sleep
+                  {%- elif r == 'timesWokenAtNight' -%}Wake-ups
+                  {%- elif r == 'mealsEaten' -%}Meals
+                  {%- else -%}{{ r }}{%- endif -%}
+                  {%- if not loop.last %}, {% endif -%}
+                {%- endfor -%}
+              </div>
+            {% endif %}
             <form method="POST"
                   action="{{ url_for('delete_day', elderly_id=elderly_id, day_id=entry.id) }}"
-                  onsubmit="return confirm('Delete this day? This cannot be undone.');"
-                  style="display: inline;">
+                  onsubmit="return confirm('Delete this day? This cannot be undone.');">
               <button type="submit" class="delete-day-button">Delete</button>
             </form>
           </div>
         {% endfor %}
       </div>
     </aside>
+
+    <div class="sidebar-overlay" data-toggle="sidebar"></div>
 
     <div class="main-content">
       {% if alerts|length > 0 %}

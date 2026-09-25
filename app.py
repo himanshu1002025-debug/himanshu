@@ -12,7 +12,7 @@ from datetime import datetime
 import random
 
 from db import query_one, query_all, execute, init_db
-from anomaly import is_anomaly
+from anomaly import analyze_day, is_anomaly
 
 app = Flask(__name__)
 app.secret_key = 'dev-only-change-me-before-deploying'
@@ -174,15 +174,23 @@ def compute_alerts(elderly_id):
             'movementCount': log['movementCount'],
             'sleepHours': log['sleepHours'],
             'timesWokenAtNight': log['timesWokenAtNight'],
+            'mealsEaten': log['mealsEaten'],
         }
         if i < 7:
-            base.update({'flagged': False, 'status': 'building baseline'})
-        else:
-            window = [logs[j]['movementCount'] for j in range(i - 7, i)]
-            flagged = is_anomaly(log['movementCount'], window)
             base.update({
-                'flagged': flagged,
-                'status': 'unusual' if flagged else 'normal'
+                'flagged': False,
+                'status': 'building baseline',
+                'reasons': [],
+                'score': 0.0,
+            })
+        else:
+            window = logs[i - 7:i]   # full rows, not just movementCount
+            analysis = analyze_day(log, window)
+            base.update({
+                'flagged': analysis['flagged'],
+                'status': 'unusual' if analysis['flagged'] else 'normal',
+                'reasons': analysis['reasons'],
+                'score': analysis['score'],
             })
         results.append(base)
 
@@ -371,10 +379,10 @@ def _build_summary(elderly_id):
     if not person or not logs:
         return None
 
-    unusual_count = 0
+        unusual_count = 0
     for i in range(7, len(logs)):
-        window = [logs[j]['movementCount'] for j in range(i - 7, i)]
-        if is_anomaly(logs[i]['movementCount'], window):
+        window = logs[i - 7:i]
+        if is_anomaly(logs[i], window):
             unusual_count += 1
 
     avg_sleep = round(sum(l['sleepHours'] for l in logs) / len(logs), 1)

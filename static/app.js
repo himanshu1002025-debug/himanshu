@@ -1,14 +1,33 @@
-// Reads window.__alerts (embedded by the dashboard template)
-// and renders a sleep-hours line chart. That's the entire
-// client-side script for the project.
+// Family Care — client-side scripts.
+// Two jobs: toggle the mobile sidebar drawer, and render the sleep chart.
 
 (function () {
+  // ---------- Mobile sidebar toggle ----------
+  const toggles = document.querySelectorAll('[data-toggle="sidebar"]');
+  const sidebar = document.querySelector('.sidebar');
+  const overlay = document.querySelector('.sidebar-overlay');
+
+  toggles.forEach(el => {
+    el.addEventListener('click', () => {
+      sidebar?.classList.toggle('open');
+      overlay?.classList.toggle('open');
+    });
+  });
+
+  // ---------- Sleep chart ----------
   const canvas = document.getElementById('sleepChart');
   if (!canvas || !window.Chart) return;
 
-const dataEl = document.getElementById('alerts-data');
-if (!dataEl) return;
-const alerts = JSON.parse(dataEl.textContent);
+  const dataEl = document.getElementById('alerts-data');
+  if (!dataEl) return;
+
+  let alerts;
+  try {
+    alerts = JSON.parse(dataEl.textContent);
+  } catch (e) {
+    console.error('Could not parse alerts data', e);
+    return;
+  }
 
   new Chart(canvas, {
     type: 'line',
