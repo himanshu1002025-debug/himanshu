@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+{% block title %}Doctors — {{ person_name }}{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('dashboard', elderly_id=elderly_id) }}" class="logout-button button-link">← Back to Dashboard</a>
+    <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+  </div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Share with a Doctor</h1>
+      <p class="page-subtitle">
+        Send a full activity summary of <strong>{{ person_name }}</strong>
+        to a specialist of your choice
+      </p>
+    </div>
+  </div>
+
+  <section class="section-block-dash">
+    <h3 class="section-header">Available Specialists</h3>
+    <div class="doctors-grid">
+      {% for d in doctors %}
+        {% set initials = d.name.split(' ')[0][0] ~ d.name.split(' ')[-1][0] %}
+        <div class="doctor-card">
+          <div class="doctor-avatar">{{ initials }}</div>
+          <div class="doctor-info">
+            <div class="doctor-name">{{ d.name }}</div>
+            <div class="doctor-specialty">{{ d.specialty }}</div>
+            <div class="doctor-hospital">{{ d.hospital }}</div>
+            <div class="doctor-meta">{{ d.experience_years }} yrs experience</div>
+          </div>
+          <a href="{{ url_for('share_report', elderly_id=elderly_id, doctor_id=d.id) }}"
+             class="doctor-share-button button-link">
+            Share Report
+          </a>
+        </div>
+      {% endfor %}
+    </div>
+  </section>
+
+  {% if shares|length > 0 %}
+    <section class="section-block-dash">
+      <h3 class="section-header">Share history</h3>
+      <div class="shares-list">
+        {% for s in shares %}
+          <div class="share-row">
+            <div class="share-left">
+              <div class="share-doctor">{{ s.doctorName }}</div>
+              <div class="share-meta">{{ s.specialty }} · {{ s.hospital }}</div>
+              <div class="share-time">{{ s.sharedAt[:16].replace('T', ' · ') }}</div>
+            </div>
+            <a class="share-email-link"
+               href="mailto:{{ s.email }}?subject={{ ('Activity report for ' ~ person_name)|urlencode }}&body={{ s.summary|urlencode }}">
+              ✉️ Open in Email
+            </a>
+          </div>
+        {% endfor %}
+      </div>
+    </section>
+  {% endif %}
+</div>
+{% endblock %}

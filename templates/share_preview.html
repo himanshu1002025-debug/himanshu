@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% block title %}Preview Report — Family Care{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('doctors', elderly_id=elderly_id) }}" class="logout-button button-link">← Cancel</a>
+    <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+  </div>
+</nav>
+
+<div class="page" style="max-width: 780px;">
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Preview Report</h1>
+      <p class="page-subtitle">
+        Review before sending to <strong>{{ doctor.name }}</strong> ({{ doctor.specialty }})
+      </p>
+    </div>
+  </div>
+
+  <div class="input-card">
+    <h3 class="section-header" style="margin-top: 0;">Summary for {{ person_name }}</h3>
+    <pre class="modal-summary">{{ summary }}</pre>
+  </div>
+
+  <form method="POST"
+        action="{{ url_for('share_report', elderly_id=elderly_id, doctor_id=doctor.id) }}"
+        style="display: flex; gap: 12px; justify-content: flex-end;">
+    <a href="{{ url_for('doctors', elderly_id=elderly_id) }}" class="logout-button button-link">Cancel</a>
+    <button type="submit" class="submit-button">Confirm & Share</button>
+  </form>
+</div>
+{% endblock %}

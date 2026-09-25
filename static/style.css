@@ -1503,3 +1503,194 @@ body {
 }
 .faq-item summary::-webkit-details-marker { display: none; }
 .faq-item[open] .faq-toggle { transform: rotate(45deg); }
+
+
+/* ============================================================
+   STAGE 3 ADDITIONS
+   ============================================================ */
+
+/* Make <a> tags styled as .picker-person-button look identical to the buttons */
+a.picker-person-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  text-decoration: none;
+  color: #3A362F;
+}
+a.picker-person-button:hover {
+  color: #3A362F;
+  text-decoration: none;
+}
+
+/* Dashboard nav: anchor-as-button styling */
+a.logout-button {
+  display: inline-block;
+  text-decoration: none;
+  text-align: center;
+}
+a.logout-button:hover { text-decoration: none; }
+
+/* Delete button inside a form */
+.day-card form { margin: 0; }
+.day-card .delete-day-button {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+/* Chart canvas */
+.chart-card canvas { display: block; }
+
+/* Print: hide delete buttons too */
+@media print {
+  .day-card form,
+  .sidebar .section-header,
+  .menu-button { display: none !important; }
+}
+
+
+/* ============================================================
+   STAGE 4 — Doctors + Share
+   ============================================================ */
+
+.section-block-dash { margin-bottom: 40px; }
+
+.doctors-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 18px;
+}
+
+.doctor-card {
+  background: white;
+  border-radius: 16px;
+  padding: 22px;
+  box-shadow: 0 4px 16px rgba(58, 54, 47, 0.06);
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.doctor-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 14px 32px rgba(58, 54, 47, 0.12);
+}
+
+.doctor-avatar {
+  width: 52px;
+  height: 52px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, #6B8F71 0%, #4E7355 100%);
+  color: white;
+  font-family: Georgia, serif;
+  font-size: 20px;
+  font-weight: bold;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 4px 12px rgba(107, 143, 113, 0.25);
+}
+
+.doctor-name {
+  font-family: Georgia, serif;
+  font-size: 17px;
+  color: #3A362F;
+  margin-bottom: 2px;
+}
+.doctor-specialty {
+  font-size: 13px;
+  font-weight: 700;
+  color: #6B8F71;
+  margin-bottom: 4px;
+}
+.doctor-hospital {
+  font-size: 13px;
+  color: #7A7368;
+  margin-bottom: 4px;
+}
+.doctor-meta {
+  font-size: 12px;
+  color: #9A9385;
+}
+
+.doctor-share-button {
+  margin-top: auto;
+  padding: 10px 18px;
+  background: #6B8F71;
+  color: white;
+  border: none;
+  border-radius: 10px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  font-family: inherit;
+  text-align: center;
+  text-decoration: none;
+}
+.doctor-share-button:hover {
+  background: #5A7C60;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(107, 143, 113, 0.35);
+  color: white;
+  text-decoration: none;
+}
+
+/* Share history */
+.shares-list {
+  background: white;
+  border-radius: 14px;
+  overflow: hidden;
+  box-shadow: 0 4px 16px rgba(58, 54, 47, 0.06);
+}
+.share-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 22px;
+  border-bottom: 1px solid #F1EFEA;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+.share-row:last-child { border-bottom: none; }
+.share-doctor { font-weight: 700; font-size: 14px; color: #3A362F; }
+.share-meta { font-size: 12px; color: #7A7368; margin-top: 2px; }
+.share-time { font-size: 12px; color: #9A9385; margin-top: 4px; }
+.share-email-link {
+  padding: 8px 16px;
+  background: #F5F3EE;
+  border-radius: 10px;
+  font-size: 12px;
+  font-weight: 600;
+  color: #5C554A;
+  text-decoration: none;
+  transition: all 0.15s ease;
+  white-space: nowrap;
+}
+.share-email-link:hover {
+  background: #6B8F71;
+  color: white;
+  text-decoration: none;
+}
+
+/* Summary preview block */
+.modal-summary {
+  background: #F8F6F1;
+  border: 1px solid #EDEAE3;
+  border-radius: 12px;
+  padding: 20px;
+  font-family: 'SFMono-Regular', Consolas, monospace;
+  font-size: 13px;
+  line-height: 1.65;
+  color: #3A362F;
+  white-space: pre-wrap;
+  margin: 0;
+  max-height: 480px;
+  overflow-y: auto;
+}
+
+@media (max-width: 768px) {
+  .doctor-card { padding: 18px; }
+  .share-row { flex-direction: column; align-items: flex-start; }
+}

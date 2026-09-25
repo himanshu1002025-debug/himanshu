@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Pick a Family Member — Family Care{% endblock %}
+
+{% block content %}
+<div class="split-screen">
+  <div class="split-visual">
+    <div class="split-visual-logo">Family Care</div>
+    <div>
+      <p class="split-visual-quote">
+        "Who are you<br>checking on today?"
+        <span>Each person has their own baseline, their own history, their own alerts.</span>
+      </p>
+    </div>
+    <div class="split-visual-footer">Signed in as {{ session.username }}</div>
+  </div>
+
+  <div class="split-form-side">
+    <div class="login-card" style="max-width: 400px;">
+      <h1 class="login-title">Family members</h1>
+      <p class="login-subtitle">Select a person to view their dashboard</p>
+
+      {% if people|length == 0 %}
+        <p class="picker-empty">
+          You don't have anyone linked yet. Add a family member below to get started.
+        </p>
+      {% endif %}
+
+      {% for person in people %}
+        <a href="{{ url_for('dashboard', elderly_id=person.id) }}"
+           class="picker-person-button button-link">
+          {{ person.name }}
+        </a>
+      {% endfor %}
+
+      <form method="POST" action="{{ url_for('add_elderly') }}" style="margin-top: 24px;">
+        <input class="login-input" type="text" name="name"
+               placeholder="Add a family member's name" minlength="2" required>
+        <button class="login-button" type="submit">Add</button>
+      </form>
+
+      <a href="{{ url_for('logout') }}" class="back-link button-link">← Log out</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

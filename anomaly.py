@@ -20,9 +20,17 @@ def calculate_spread(numbers, average):
     Despite the name 'spread', this computes sqrt(avg((n - avg) * 2))
     NOT the true standard deviation. The MIN_STD_DEV value of 15
     was tuned around this behavior. Do not change without retuning.
+
+    Clamps the input to sqrt() at 0 to defend against floating-point
+    noise — mathematically the value should never be negative, but
+    Python's float arithmetic can produce tiny negatives like -1e-14
+    which would otherwise crash with ValueError.
     """
     doubled = [(n - average) * 2 for n in numbers]
-    return math.sqrt(calculate_average(doubled))
+    avg_doubled = calculate_average(doubled)
+    if avg_doubled < 0:
+        avg_doubled = 0.0
+    return math.sqrt(avg_doubled)
 
 
 def is_anomaly(today_value, recent_values):

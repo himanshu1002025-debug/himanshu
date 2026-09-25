@@ -1,0 +1,142 @@
+{% extends "base.html" %}
+{% block title %}{{ person_name }} — Family Care{% endblock %}
+
+{% block head %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+  <a href="{{ url_for('doctors', elderly_id=elderly_id) }}" class="logout-button button-link">🩺 Doctors</a>
+  <a href="{{ url_for('picker') }}" class="logout-button button-link">← Family</a>
+  <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+</div>
+</nav>
+
+<div class="page">
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="avatar">{{ initial }}</div>
+      <div>
+        <h1 class="page-title">{{ person_name }}</h1>
+        <p class="page-subtitle">Daily activity monitor — last 30 days</p>
+      </div>
+    </div>
+    <button class="download-button" onclick="window.print()">📄 Download Report</button>
+  </div>
+
+  <div class="stat-row">
+    <div class="stat-card tint-green">
+      <div class="stat-icon">📅</div>
+      <div class="stat-label">Days Tracked</div>
+      <div class="stat-value">{{ alerts|length }}</div>
+    </div>
+    <div class="stat-card tint-coral {% if unusual_count > 0 %}alert{% endif %}">
+      <div class="stat-icon">⚠️</div>
+      <div class="stat-label">Unusual Days</div>
+      <div class="stat-value">{{ unusual_count }}</div>
+    </div>
+    <div class="stat-card tint-blue">
+      <div class="stat-icon">🏃</div>
+      <div class="stat-label">Avg Activity</div>
+      <div class="stat-value">{{ avg_activity }}</div>
+    </div>
+    <div class="stat-card tint-purple">
+      <div class="stat-icon">😴</div>
+      <div class="stat-label">Avg Sleep</div>
+      <div class="stat-value">{{ avg_sleep }}h</div>
+    </div>
+  </div>
+
+  <div class="dashboard-layout">
+    <aside class="sidebar">
+      <h3 class="section-header">Daily log</h3>
+      <div class="day-grid">
+        {% for entry in alerts %}
+          <div class="day-card status-{{ entry.status.replace(' ', '-') if entry.status == 'building baseline' else entry.status }}">
+            <div class="day-label">{{ entry.date or ('Day ' ~ entry.day) }}</div>
+            <div class="day-detail">Activity: {{ entry.movementCount }}</div>
+            <div class="day-detail">Sleep: {{ entry.sleepHours }}h · woke {{ entry.timesWokenAtNight }}x</div>
+            <form method="POST"
+                  action="{{ url_for('delete_day', elderly_id=elderly_id, day_id=entry.id) }}"
+                  onsubmit="return confirm('Delete this day? This cannot be undone.');"
+                  style="display: inline;">
+              <button type="submit" class="delete-day-button">Delete</button>
+            </form>
+          </div>
+        {% endfor %}
+      </div>
+    </aside>
+
+    <div class="main-content">
+      {% if alerts|length > 0 %}
+        <div class="summary-banner {% if unusual_count > 0 %}has-alerts{% else %}all-clear{% endif %}">
+          <div class="summary-banner-icon">{% if unusual_count > 0 %}⚠️{% else %}✓{% endif %}</div>
+          <div>
+            <p class="summary-banner-title">
+              {% if unusual_count > 0 %}
+                {{ unusual_count }} unusual day{{ 's' if unusual_count > 1 else '' }} detected
+              {% else %}
+                All clear this month
+              {% endif %}
+            </p>
+            <p class="summary-banner-sub">
+              {% if unusual_count > 0 %}
+                Review the highlighted days in the daily log below
+              {% else %}
+                No unusual activity patterns in the last 30 days
+              {% endif %}
+            </p>
+          </div>
+        </div>
+      {% endif %}
+
+      <h3 class="section-header">Log today's activity</h3>
+      <div class="input-card">
+        <form method="POST" action="{{ url_for('add_day', elderly_id=elderly_id) }}">
+          <div class="input-row">
+            <div class="input-field">
+              <label>Wake-up hour (0–23)</label>
+              <input type="number" name="wakeUpTime" min="0" max="23" required>
+            </div>
+            <div class="input-field">
+              <label>Meals eaten (0–5)</label>
+              <input type="number" name="mealsEaten" min="0" max="5" required>
+            </div>
+            <div class="input-field">
+              <label>Activity Level (0–100000)</label>
+              <input type="number" name="movementCount" min="0" max="100000" required>
+            </div>
+          </div>
+          <div class="input-row">
+            <div class="input-field">
+              <label>Sleep hours (0–24)</label>
+              <input type="number" name="sleepHours" min="0" max="24" step="0.5" required>
+            </div>
+            <div class="input-field">
+              <label>Times woken (0–20)</label>
+              <input type="number" name="timesWokenAtNight" min="0" max="20" required>
+            </div>
+          </div>
+          <button class="submit-button" type="submit">Submit today's data</button>
+        </form>
+      </div>
+
+      {% if alerts|length > 0 %}
+        <h3 class="section-header">Sleep hours over time</h3>
+        <div class="chart-card">
+          <div style="height: 260px; position: relative;">
+            <canvas id="sleepChart"></canvas>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</div>
+
+<script id="alerts-data" type="application/json">{{ alerts|tojson }}</script>
+<script src="{{ url_for('static', filename='app.js') }}"></script>
+{% endblock %}
