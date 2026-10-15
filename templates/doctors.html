@@ -44,6 +44,40 @@
     </div>
   </section>
 
+  <section class="section-block-dash">
+    <h3 class="section-header">Add a new doctor</h3>
+    <div class="input-card">
+      <form method="POST" action="{{ url_for('add_doctor') }}">
+        <input type="hidden" name="elderly_id" value="{{ elderly_id }}">
+        <div class="input-row">
+          <div class="input-field">
+            <label>Full name</label>
+            <input type="text" name="name" placeholder="Dr. ..." minlength="3" required>
+          </div>
+          <div class="input-field">
+            <label>Specialty</label>
+            <input type="text" name="specialty" placeholder="e.g. Cardiology" minlength="3" required>
+          </div>
+        </div>
+        <div class="input-row">
+          <div class="input-field">
+            <label>Hospital / Clinic</label>
+            <input type="text" name="hospital" placeholder="e.g. Apollo Hospital, Delhi">
+          </div>
+          <div class="input-field">
+            <label>Email</label>
+            <input type="email" name="email" placeholder="doctor@example.com">
+          </div>
+          <div class="input-field">
+            <label>Years of experience</label>
+            <input type="number" name="experience_years" min="0" max="80" placeholder="e.g. 12" required>
+          </div>
+        </div>
+        <button class="submit-button" type="submit">Add doctor</button>
+      </form>
+    </div>
+  </section>
+
   {% if shares|length > 0 %}
     <section class="section-block-dash">
       <h3 class="section-header">Share history</h3>

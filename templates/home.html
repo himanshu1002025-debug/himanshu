@@ -7,6 +7,9 @@
   <nav class="navbar">
     <div class="navbar-logo">Family Care</div>
     <div class="nav-links">
+      <a href="{{ url_for('connect_wearable') }}" class="nav-text-link">Connect a wearable</a>
+      <a href="{{ url_for('connect_sensor') }}" class="nav-text-link">Phone sensor</a>
+      <a href="{{ url_for('how_it_works_public') }}" class="nav-text-link">How it works</a>
       {% if session.user_id %}
         <a href="{{ url_for('picker') }}" class="navbar-button button-link">Go to Dashboard</a>
       {% else %}
@@ -15,30 +18,117 @@
     </div>
   </nav>
 
-  <section class="hero">
-    <h1 class="hero-title">Peace of mind, every single day</h1>
-    <p class="hero-tagline">
-      We quietly watch daily activity patterns and tell you the moment
-      something looks different — so you don't have to check in
-      constantly to feel sure they're okay.
-    </p>
-    {% if session.user_id %}
-      <a href="{{ url_for('picker') }}" class="hero-button button-link">Open Dashboard</a>
-    {% else %}
-      <a href="{{ url_for('login') }}" class="hero-button button-link">Get Started</a>
-    {% endif %}
-    <p class="hero-note">No hardware needed · Works with manual entry or devices</p>
-  </section>
+  <section class="hero-v2">
+    <div class="hero-v2-inner">
+      <div class="hero-v2-left">
+        <div class="hero-badge">
+          <span class="hero-badge-dot"></span>
+          Live monitoring · No hardware needed
+        </div>
 
-  <div class="trust-strip">
-    <span>7-day baseline learning</span>
-    <span class="trust-dot">·</span>
-    <span>Adaptive thresholds</span>
-    <span class="trust-dot">·</span>
-    <span>Multi-family accounts</span>
-    <span class="trust-dot">·</span>
-    <span>Device-ready API</span>
-  </div>
+        <h1 class="hero-v2-title">
+          Peace of mind,<br>
+          every single day.
+        </h1>
+
+        <p class="hero-v2-tagline">
+          We quietly watch daily activity patterns and tell you the moment
+          something looks different — so you don't have to check in constantly
+          to feel sure they're okay.
+        </p>
+
+        <div class="hero-v2-actions">
+          {% if session.user_id %}
+            <a href="{{ url_for('picker') }}" class="hero-v2-primary">Open Dashboard</a>
+          {% else %}
+            <a href="{{ url_for('login') }}" class="hero-v2-primary">Get Started</a>
+          {% endif %}
+          <a href="{{ url_for('how_it_works_public') }}" class="hero-v2-secondary">
+            See how it works →
+          </a>
+        </div>
+
+        <div class="hero-v2-trust">
+          <span>7-day adaptive baseline</span>
+          <span class="hero-v2-trust-dot">·</span>
+          <span>Multi-signal detection</span>
+          <span class="hero-v2-trust-dot">·</span>
+          <span>Device-ready API</span>
+        </div>
+      </div>
+
+      <div class="hero-v2-right">
+        <div class="hero-float hero-float-top">😴 &nbsp;7.2h avg sleep</div>
+        <div class="hero-float hero-float-bottom">⚠️ &nbsp;Day 22 flagged</div>
+
+        <div class="mockup-card">
+          <div class="mockup-header">
+            <div class="mockup-avatar">K</div>
+            <div class="mockup-user">
+              <div class="mockup-name">Kamla Devi</div>
+              <div class="mockup-sub">Daily activity monitor</div>
+            </div>
+            <div class="mockup-live">
+              <span class="mockup-live-dot"></span>
+              Live
+            </div>
+          </div>
+
+          <div class="mockup-banner">
+            <span class="mockup-banner-icon">⚠️</span>
+            <div>
+              <div class="mockup-banner-title">2 unusual days detected</div>
+              <div class="mockup-banner-sub">Review flagged days below</div>
+            </div>
+          </div>
+
+          <div class="mockup-stats">
+            <div class="mockup-stat">
+              <div class="mockup-stat-label">Days</div>
+              <div class="mockup-stat-value">30</div>
+            </div>
+            <div class="mockup-stat mockup-stat-alert">
+              <div class="mockup-stat-label">Unusual</div>
+              <div class="mockup-stat-value">2</div>
+            </div>
+            <div class="mockup-stat">
+              <div class="mockup-stat-label">Avg sleep</div>
+              <div class="mockup-stat-value">7.2h</div>
+            </div>
+          </div>
+
+          <div class="mockup-chart-wrap">
+            <div class="mockup-chart-label">Sleep hours · last 30 days</div>
+            <svg class="mockup-chart" viewBox="0 0 300 100" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="mockGrad" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#6B8F71" stop-opacity="0.32"/>
+                  <stop offset="100%" stop-color="#6B8F71" stop-opacity="0"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,42 L25,33 L50,46 L75,30 L100,38 L125,28 L150,43 L175,36 L200,32 L225,78 L250,42 L275,34 L300,38 L300,100 L0,100 Z"
+                    fill="url(#mockGrad)" stroke="none"/>
+              <path d="M0,42 L25,33 L50,46 L75,30 L100,38 L125,28 L150,43 L175,36 L200,32 L225,78 L250,42 L275,34 L300,38"
+                    fill="none" stroke="#6B8F71" stroke-width="2.5"
+                    stroke-linecap="round" stroke-linejoin="round"/>
+              <circle cx="225" cy="78" r="5" fill="#D97A5F" stroke="white" stroke-width="2.5"/>
+            </svg>
+          </div>
+
+          <div class="mockup-footer">
+            <div class="mockup-pill">
+              <span class="mockup-pill-dot"></span>
+              Normal
+            </div>
+            <div class="mockup-pill mockup-pill-warn">
+              <span>⚠</span>
+              Unusual
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
 
   <section class="features">
     <div class="feature-card">
@@ -92,6 +182,11 @@
         <p class="step-text">Adaptive thresholds avoid false alarms, and you see exactly why each day was flagged.</p>
       </div>
     </div>
+    <div class="section-cta">
+      <a href="{{ url_for('how_it_works_public') }}" class="section-cta-link">
+        See the exact detection math →
+      </a>
+    </div>
   </section>
 
   <section class="section-block alternate">
@@ -121,6 +216,11 @@
         <p class="different-text">Multiple family members can log in and check on the same person — responsibility doesn't land on one tired caregiver.</p>
       </div>
     </div>
+    <div class="section-cta">
+      <a href="{{ url_for('how_it_works_public') }}" class="section-cta-link">
+        Walk through the exact math on a real example →
+      </a>
+    </div>
   </section>
 
   <section class="section-block">
@@ -135,7 +235,10 @@
       </details>
       <details class="faq-item">
         <summary class="faq-question"><span>How does it know what "normal" looks like?</span><span class="faq-toggle">+</span></summary>
-        <div class="faq-answer">The system learns each person's own baseline from their recent activity history, then flags days that deviate meaningfully from that baseline.</div>
+        <div class="faq-answer">
+          The system learns each person's own baseline from their recent activity history, then flags days that deviate meaningfully from that baseline.
+          <a href="{{ url_for('how_it_works_public') }}">See the exact math →</a>
+        </div>
       </details>
       <details class="faq-item">
         <summary class="faq-question"><span>What happens during the first week?</span><span class="faq-toggle">+</span></summary>
@@ -170,7 +273,10 @@
       <div class="footer-logo">Family Care</div>
       <p class="footer-tagline">Remote elderly activity monitoring — built as a full-stack college project, 2026.</p>
     </div>
-    <div class="footer-meta"><span>Flask · SQLite · Jinja2</span></div>
+    <div class="footer-meta">
+      <a href="{{ url_for('how_it_works_public') }}" class="footer-link">How it works</a>
+      <span>Flask · SQLite · Jinja2</span>
+    </div>
   </footer>
 
 </div>

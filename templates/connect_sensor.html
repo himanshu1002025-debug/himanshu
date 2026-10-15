@@ -1,0 +1,109 @@
+{% extends "base.html" %}
+{% block title %}Connect a sensor — Family Care{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('home') }}" class="logout-button button-link">← Home</a>
+    <a href="{{ url_for('login') }}" class="logout-button button-link">Log In</a>
+  </div>
+</nav>
+
+<div class="page" style="max-width: 720px;">
+  <div class="page-header" style="display: block;">
+    <h1 class="page-title">Connect a real sensor</h1>
+    <p class="page-subtitle">
+      Use your phone's actual accelerometer to send live motion data to Family Care.
+      No app to install — this runs in the browser.
+    </p>
+  </div>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">Open this page on your phone</h2>
+    <p class="explain-text">
+      Your phone needs to reach the same server that's running on your laptop.
+      On the same WiFi, this URL should work:
+    </p>
+    <div class="sensor-url-box">
+      <code>{{ lan_url }}</code>
+      <button type="button" class="copy-btn" onclick="copySensorUrl(this)">Copy</button>
+    </div>
+    <p class="explain-text" style="font-size: 13px; color: #7A7368; margin-top: 12px;">
+      Tip: if the phone can't reach it, check that both devices are on the same WiFi
+      and that Windows Firewall allows Python to accept connections.
+    </p>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">Then, on this device</h2>
+
+    <div class="input-card" style="margin-bottom: 0;">
+      <div class="form-group">
+        <label style="display: block; font-size: 12px; font-weight: 600; color: #7A7368; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px;">
+          Device API key
+        </label>
+        <input id="apiKeyInput" class="login-input" type="text"
+               placeholder="Paste the device API key"
+               value="{% if devices %}{{ devices[0].apiKey }}{% endif %}">
+        {% if devices %}
+          <p style="font-size: 12px; color: #7A7368; margin: 8px 0 0 0;">
+            Available:
+            {% for d in devices %}
+              <code style="background:#F5F3EE; padding:2px 6px; border-radius:4px;">{{ d.apiKey }}</code> ({{ d.personName }}){% if not loop.last %}, {% endif %}
+            {% endfor %}
+          </p>
+        {% else %}
+          <p style="font-size: 12px; color: #7A7368; margin: 8px 0 0 0;">
+            No manually-created devices found. You can still enter
+            <code style="background:#F5F3EE; padding:2px 6px; border-radius:4px;">demo-device-key-123</code>
+            if the demo device exists in the database.
+          </p>
+        {% endif %}
+      </div>
+
+      <div id="deviceStatus" class="sensor-status">
+        Enter the API key above and tap Start to begin.
+      </div>
+
+      <div style="display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap;">
+        <button id="startBtn" class="submit-button" type="button" onclick="startSensor()">
+          ▶ Start tracking
+        </button>
+        <button id="stopBtn" class="logout-button" type="button" onclick="stopSensor()" disabled>
+          ■ Stop
+        </button>
+      </div>
+    </div>
+
+    <div id="motionBar" class="motion-bar-wrap" style="display: none;">
+      <div class="motion-bar-label">Live motion energy</div>
+      <div class="motion-bar-track"><div id="motionBar" class="motion-bar-fill"></div></div>
+    </div>
+
+    <div class="reading-log-wrap">
+      <div class="reading-log-label">Recent readings</div>
+      <div id="readingLog" class="reading-log">
+        <div class="reading-log-empty">Nothing sent yet.</div>
+      </div>
+    </div>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">How it works</h2>
+    <ol class="explain-steps">
+      <li>Your phone reads its accelerometer via the browser's <code>DeviceMotion</code> API.</li>
+      <li>Every 3 seconds, motion energy is summarized into a single reading (roughly 80–120 for gentle movement).</li>
+      <li>That reading is POSTed to <code>/api/sensor-data</code> with the API key — the same endpoint a real wearable would use.</li>
+      <li>The server records it against the linked elderly person using the same "one entry per person per date" rule.</li>
+    </ol>
+    <p class="explain-text" style="margin-top: 16px; font-size: 13px; color: #7A7368;">
+      <strong>Note on iOS:</strong> Safari requires HTTPS for motion sensors. If you're on iPhone,
+      this page won't work over plain HTTP. Android Chrome works fine over your local network.
+    </p>
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='sensor.js') }}"></script>
+{% endblock %}

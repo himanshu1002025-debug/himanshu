@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+{% block title %}Connect a wearable — Family Care{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+    <a href="{{ url_for('picker') }}" class="logout-button button-link">← Family</a>
+    <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+  </div>
+</nav>
+
+<div class="page" style="max-width: 900px;">
+  <div class="page-header" style="display: block;">
+    <h1 class="page-title">Connect a wearable</h1>
+    <p class="page-subtitle">
+      Link a smartwatch or fitness tracker to start feeding activity data into
+      Family Care automatically.
+    </p>
+  </div>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">1. Choose your device</h2>
+    <p class="explain-text" style="margin-bottom: 20px;">
+      Select the wearable brand. In a real deployment this would launch the
+      manufacturer's OAuth consent screen — here we create a real device
+      record and start streaming sample readings so you can see the flow.
+    </p>
+
+    <div class="wearable-grid">
+      <button type="button" class="wearable-card" data-brand="Fitbit">
+        <div class="wearable-icon" style="background: linear-gradient(135deg, #00B0B9, #008A99);">
+          <svg viewBox="0 0 24 32" fill="white">
+            <circle cx="12" cy="8" r="3"/>
+            <circle cx="12" cy="16" r="3"/>
+            <circle cx="12" cy="24" r="3"/>
+          </svg>
+        </div>
+        <div class="wearable-name">Fitbit</div>
+        <div class="wearable-desc">Charge · Versa · Sense</div>
+      </button>
+
+      <button type="button" class="wearable-card" data-brand="Apple Watch">
+        <div class="wearable-icon" style="background: linear-gradient(135deg, #3A3A3A, #1A1A1A);">
+          <svg viewBox="0 0 24 32" fill="white">
+            <rect x="7" y="2" width="10" height="4" rx="1"/>
+            <rect x="5" y="7" width="14" height="18" rx="3.5"/>
+            <rect x="7" y="26" width="10" height="4" rx="1"/>
+          </svg>
+        </div>
+        <div class="wearable-name">Apple Watch</div>
+        <div class="wearable-desc">Series · SE · Ultra</div>
+      </button>
+
+      <button type="button" class="wearable-card" data-brand="Garmin">
+        <div class="wearable-icon" style="background: linear-gradient(135deg, #007CC3, #005B91);">
+          <svg viewBox="0 0 24 32" fill="white">
+            <circle cx="12" cy="16" r="9"/>
+            <path d="M12 11 L16 20 L8 20 Z" fill="white"/>
+          </svg>
+        </div>
+        <div class="wearable-name">Garmin</div>
+        <div class="wearable-desc">Venu · Vivoactive · Forerunner</div>
+      </button>
+    </div>
+  </section>
+
+  <section class="explain-block" id="pickPersonStep" hidden>
+    <h2 class="explain-heading">2. Which person is this for?</h2>
+    <p class="explain-text" style="margin-bottom: 16px;">
+      Readings from this wearable will be stored against the selected person.
+    </p>
+
+    <div class="form-group">
+      <label style="display: block; font-size: 12px; font-weight: 600; color: #7A7368; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 6px;">
+        Person
+      </label>
+      <select id="elderlySelect" class="login-input">
+        {% for p in elderly_people %}
+          <option value="{{ p.id }}">{{ p.name }}</option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <div class="wearable-actions">
+      <button type="button" class="submit-button" onclick="confirmWearableConnect()">
+        Connect <span id="pickBrandName"></span>
+      </button>
+    </div>
+  </section>
+
+  <section class="explain-block" id="connectingStep" hidden>
+    <div class="wearable-connecting">
+      <div class="wearable-spinner"></div>
+      <div>
+        <h3 class="wearable-connecting-title">Authorising with <span id="connectingBrandName"></span>…</h3>
+        <p class="wearable-connecting-sub">Negotiating permission and creating a device key.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="explain-block wearable-success-block" id="connectedStep" hidden>
+    <div class="wearable-success-icon">✓</div>
+    <div>
+      <h2 class="explain-heading" style="margin-bottom: 6px;">
+        <span id="connectedBrand"></span> connected
+      </h2>
+      <p class="explain-text" style="margin-bottom: 12px;">
+        A device key was generated and stored against your account. Readings
+        will arrive every 30 seconds and update the dashboard automatically.
+      </p>
+      <div class="wearable-key-row">
+        <span class="wearable-key-label">Device key:</span>
+        <code id="connectedKey" class="wearable-key">—</code>
+      </div>
+    </div>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">Connected wearables</h2>
+    <div id="connectedList">
+      <p class="muted-text">Loading…</p>
+    </div>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">How this maps to a real integration</h2>
+    <ol class="explain-steps">
+      <li>
+        A real wearable normally syncs to the user's phone (Apple Health /
+        Google Health Connect), or to the manufacturer's cloud (Fitbit, Garmin).
+      </li>
+      <li>
+        Your server either runs a companion mobile app that reads from the
+        health platform, or authorises via OAuth against the manufacturer's
+        cloud.
+      </li>
+      <li>
+        Whichever path you take, the result is the same: readings are POSTed
+        to <code>/api/sensor-data</code> with a valid device API key.
+      </li>
+      <li>
+        The API key you see on this page is exactly that — a real, per-device
+        credential. The only thing this demo simplifies is the OAuth handshake,
+        which requires public HTTPS hosting and manufacturer approval to test.
+      </li>
+    </ol>
+  </section>
+</div>
+
+<script src="{{ url_for('static', filename='wearable.js') }}"></script>
+{% endblock %}

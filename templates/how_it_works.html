@@ -1,0 +1,246 @@
+{% extends "base.html" %}
+{% block title %}How detection works — Family Care{% endblock %}
+
+{% block content %}
+
+<nav class="dashboard-nav">
+  <div class="navbar-logo">Family Care</div>
+  <div style="display: flex; gap: 10px;">
+    {% if is_public %}
+      <a href="{{ url_for('home') }}" class="logout-button button-link">← Back to home</a>
+      <a href="{{ url_for('login') }}" class="navbar-button button-link">Log In</a>
+    {% else %}
+      <a href="{{ url_for('dashboard', elderly_id=elderly_id) }}" class="logout-button button-link">← Back to Dashboard</a>
+      <a href="{{ url_for('logout') }}" class="logout-button button-link">Log Out</a>
+    {% endif %}
+  </div>
+</nav>
+
+<div class="page" style="max-width: 900px;">
+
+  <div class="page-header" style="display: block;">
+    <h1 class="page-title">How unusual days are detected</h1>
+    <p class="page-subtitle">
+      {% if is_public %}
+        Full transparency into the algorithm — no black boxes.
+        This page uses sample data so anyone can see exactly how a day gets flagged.
+      {% else %}
+        Full transparency into the algorithm behind {{ person_name }}'s alerts.
+        No black boxes.
+      {% endif %}
+    </p>
+  </div>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">In plain words</h2>
+    <p class="explain-text">
+      The system does not use fixed thresholds like "alert if activity drops below 50".
+      Instead, it learns what is normal <em>for this specific person</em> by looking at
+      their recent history, then measures how far today is from that personal baseline.
+      A day is flagged only if the deviation is statistically significant across one
+      or more metrics.
+    </p>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">The algorithm, step by step</h2>
+    <ol class="explain-steps">
+      <li>
+        <strong>Build a baseline.</strong>
+        For every day being evaluated, take the previous <strong>7 days</strong>
+        of that person's data as their current "normal".
+      </li>
+      <li>
+        <strong>Compute deviation per metric.</strong>
+        For each metric — activity level, sleep hours, wake-ups, meals —
+        compute how many standard deviations today's value is from the mean
+        of the 7-day window. This is called a <em>z-score</em>.
+      </li>
+      <li>
+        <strong>Apply a floor to the spread.</strong>
+        If the 7-day window happened to be unusually steady, a tiny change
+        could look huge in z-score terms. A per-metric <em>floor</em> prevents
+        this — the standard deviation is never allowed below that floor.
+      </li>
+      <li>
+        <strong>Flag if either condition is met.</strong>
+        A day is marked unusual if
+        (a) any single metric has a z-score at or above its <em>severe</em>
+        threshold, or (b) the weighted sum of all z-scores crosses the
+        combined threshold of <strong>{{ combined_threshold }}</strong>.
+      </li>
+    </ol>
+  </section>
+
+  <section class="explain-block">
+    <h2 class="explain-heading">Configuration</h2>
+    <p class="explain-text" style="margin-bottom: 16px;">
+      These are the exact values used by the current detection engine:
+    </p>
+    <div class="config-table-wrap">
+      <table class="config-table">
+        <thead>
+          <tr>
+            <th>Metric</th>
+            <th>Floor (min std dev)</th>
+            <th>Weight</th>
+            <th>Severe z-score</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for row in config_rows %}
+            <tr>
+              <td>{{ row.label }}</td>
+              <td>{{ row.floor }}</td>
+              <td>{{ row.weight }}</td>
+              <td>≥ {{ row.severe }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  {% if example %}
+    <section class="explain-block">
+      <h2 class="explain-heading">
+        Worked example — {{ example.day_label }}
+        {% if is_public %}
+          <span class="explain-badge">SAMPLE DATA</span>
+        {% endif %}
+      </h2>
+      <p class="explain-text" style="margin-bottom: 20px;">
+        This is a real evaluation with the exact numbers that went into the decision.
+        The baseline used is the {{ example.baseline_days }} days immediately before it.
+      </p>
+
+      <div class="metric-cards">
+        {% for m in example.metrics %}
+          <div class="metric-card {% if m.triggered_severe %}metric-card-severe{% endif %}">
+            <div class="metric-card-header">
+              <span class="metric-card-name">{{ m.label }}</span>
+              {% if m.triggered_severe %}
+                <span class="metric-badge metric-badge-severe">SEVERE</span>
+              {% endif %}
+            </div>
+
+            <div class="metric-row">
+              <span class="metric-row-label">Last 7 days</span>
+              <span class="metric-row-value metric-values">
+                {%- for v in m.window_values -%}
+                  {{ v }}{%- if not loop.last %}, {% endif -%}
+                {%- endfor -%}
+              </span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-row-label">Mean</span>
+              <span class="metric-row-value">{{ m.mean }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-row-label">Std deviation</span>
+              <span class="metric-row-value">{{ m.std_dev }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-row-label">Floor applied</span>
+              <span class="metric-row-value">{{ m.floor }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-row-label">Effective spread</span>
+              <span class="metric-row-value">{{ m.effective_sd }}</span>
+            </div>
+            <div class="metric-row metric-row-today">
+              <span class="metric-row-label">Today's value</span>
+              <span class="metric-row-value">{{ m.today }}</span>
+            </div>
+            <div class="metric-row metric-row-z">
+              <span class="metric-row-label">Z-score</span>
+              <span class="metric-row-value">{{ m.z }}</span>
+            </div>
+            <div class="metric-row">
+              <span class="metric-row-label">Weight × Z</span>
+              <span class="metric-row-value">{{ m.weight }} × {{ m.z }} = <strong>{{ m.contribution }}</strong></span>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+
+      <div class="verdict-panel {% if example.flagged %}verdict-flagged{% else %}verdict-normal{% endif %}">
+        <div class="verdict-row">
+          <span class="verdict-label">Combined weighted score</span>
+          <span class="verdict-value">{{ example.combined_score }}</span>
+        </div>
+        <div class="verdict-row">
+          <span class="verdict-label">Combined threshold</span>
+          <span class="verdict-value">{{ combined_threshold }}</span>
+        </div>
+        <div class="verdict-row verdict-row-final">
+          <span class="verdict-label">Verdict</span>
+          <span class="verdict-value">
+            {% if example.flagged %}
+              FLAGGED as unusual
+            {% else %}
+              Normal day
+            {% endif %}
+          </span>
+        </div>
+        {% if example.reasons_labels %}
+          <div class="verdict-reasons">
+            Triggered by: {{ example.reasons_labels|join(', ') }}
+          </div>
+        {% endif %}
+      </div>
+    </section>
+  {% else %}
+    <section class="explain-block">
+      <h2 class="explain-heading">Worked example</h2>
+      <p class="explain-text">
+        Not enough history yet to show a worked example. Once
+        {{ person_name }} has at least 8 days of logged data, this section
+        will display a real example broken down by metric.
+      </p>
+    </section>
+  {% endif %}
+
+  <section class="explain-block">
+    <h2 class="explain-heading">Why this design</h2>
+    <ul class="explain-list">
+      <li>
+        <strong>Adaptive, not fixed.</strong>
+        Fixed thresholds cause alert fatigue — a naturally calm person triggers
+        constant false alarms. Per-person baselines avoid that.
+      </li>
+      <li>
+        <strong>Per-metric floors.</strong>
+        Without them, an unusually steady week would make tiny changes look
+        statistically extreme, and false positives would spike.
+      </li>
+      <li>
+        <strong>Multi-signal.</strong>
+        A single "unusual" metric is often noise. Two or three shifting together
+        is a stronger signal — which is why the combined score exists.
+      </li>
+      <li>
+        <strong>Transparent.</strong>
+        This page exists because we think families deserve to know why an alert
+        was raised — not just be told that it was.
+      </li>
+    </ul>
+  </section>
+
+  {% if is_public %}
+    <section class="explain-block explain-cta">
+      <h2 class="explain-heading">See this on your own data</h2>
+      <p class="explain-text">
+        Create an account, add a family member, and this exact breakdown
+        will run on their real activity patterns — with the numbers you
+        actually logged.
+      </p>
+      <div class="explain-cta-actions">
+        <a href="{{ url_for('signup') }}" class="submit-button button-link">Create an account</a>
+        <a href="{{ url_for('login') }}" class="logout-button button-link">Log in</a>
+      </div>
+    </section>
+  {% endif %}
+
+</div>
+{% endblock %}
